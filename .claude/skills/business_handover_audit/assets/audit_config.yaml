@@ -1,0 +1,238 @@
+reporting:
+  period: "weekly"  # daily, weekly, monthly, quarterly
+  start_day: "monday"
+  include_weekends: false
+  timezone: "America/New_York"
+
+metrics:
+  # Financial targets
+  revenue_target: 500000  # Monthly revenue target
+  expense_budget: 200000  # Monthly expense budget
+
+  # Operational targets
+  task_completion_target: 0.65  # 65% completion rate
+  customer_growth_target: 0.05  # 5% monthly growth
+  response_time_target: 4  # hours
+
+  # Team targets
+  team_utilization_target: 0.85  # 85% utilization
+  overtime_limit: 0.10  # 10% of total hours
+
+thresholds:
+  # Warning thresholds
+  revenue_warning: 0.90  # Warn if below 90% of target
+  expense_warning: 0.95  # Warn if above 95% of budget
+  task_backlog_warning: 10  # Warn if >10 pending tasks
+  approval_backlog_warning: 5  # Warn if >5 pending approvals
+
+  # Critical thresholds
+  revenue_critical: 0.75  # Critical if below 75% of target
+  expense_critical: 1.00  # Critical if at or above 100% of budget
+  task_backlog_critical: 20  # Critical if >20 pending tasks
+
+  # Customer thresholds
+  churn_warning: 0.05  # Warn if churn >5%
+  satisfaction_warning: 85  # Warn if satisfaction <85%
+
+categories:
+  revenue_sources:
+    - "Enterprise Contracts"
+    - "SMB Subscriptions"
+    - "Professional Services"
+    - "Product Sales"
+    - "Other"
+
+  expense_categories:
+    - "Payroll"
+    - "Marketing"
+    - "Infrastructure"
+    - "Operations"
+    - "Travel"
+    - "Software"
+    - "Other"
+
+  task_types:
+    - "plan"
+    - "email"
+    - "invoice"
+    - "expense"
+    - "meeting"
+    - "project"
+    - "other"
+
+alerts:
+  enabled: true
+
+  email_recipients:
+    - "ceo@company.com"
+    - "cfo@company.com"
+    - "coo@company.com"
+
+  slack_webhook: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+
+  conditions:
+    - metric: "revenue"
+      threshold: 0.90
+      severity: "warning"
+      message: "Revenue below 90% of target"
+
+    - metric: "revenue"
+      threshold: 0.75
+      severity: "critical"
+      message: "Revenue critically low - below 75% of target"
+
+    - metric: "expenses"
+      threshold: 0.95
+      severity: "warning"
+      message: "Expenses above 95% of budget"
+
+    - metric: "expenses"
+      threshold: 1.00
+      severity: "critical"
+      message: "Expenses at or above budget limit"
+
+    - metric: "task_backlog"
+      threshold: 10
+      severity: "warning"
+      message: "Task backlog above threshold"
+
+    - metric: "customer_churn"
+      threshold: 0.05
+      severity: "warning"
+      message: "Customer churn rate elevated"
+
+custom_metrics:
+  - name: "Customer Lifetime Value"
+    formula: "total_revenue / total_customers"
+    target: 50000
+    unit: "dollars"
+
+  - name: "Team Efficiency"
+    formula: "completed_tasks / team_size"
+    target: 1.5
+    unit: "tasks_per_person"
+
+  - name: "Revenue per Employee"
+    formula: "revenue / team_size"
+    target: 40000
+    unit: "dollars"
+
+  - name: "CAC Ratio"
+    formula: "customer_lifetime_value / customer_acquisition_cost"
+    target: 3.0
+    unit: "ratio"
+
+report_sections:
+  include:
+    - "executive_summary"
+    - "financial_performance"
+    - "operational_metrics"
+    - "completed_work"
+    - "pending_items"
+    - "key_wins"
+    - "concerns"
+    - "trends"
+    - "recommendations"
+    - "appendix"
+
+  exclude: []
+
+  custom_sections:
+    - name: "Sales Pipeline"
+      enabled: false
+      template: "sales_pipeline.md"
+
+    - name: "Customer Health"
+      enabled: false
+      template: "customer_health.md"
+
+formatting:
+  currency_symbol: "$"
+  currency_format: "{symbol}{amount:,.0f}"
+  percentage_format: "{value:.1f}%"
+  date_format: "%B %d, %Y"
+
+  priority_icons:
+    high: "🔴"
+    medium: "🟡"
+    low: "🟢"
+
+  status_icons:
+    healthy: "🟢"
+    caution: "🟡"
+    critical: "🔴"
+
+export:
+  formats:
+    - "markdown"
+    - "json"
+
+  json_options:
+    indent: 2
+    include_raw_data: false
+
+  pdf_options:
+    enabled: false
+    template: "report_template.html"
+    css: "report_styles.css"
+
+automation:
+  schedule:
+    enabled: false
+    cron: "0 9 * * 1"  # Every Monday at 9 AM
+    timezone: "America/New_York"
+
+  post_generation:
+    - action: "email"
+      recipients: ["ceo@company.com"]
+      subject: "Weekly Business Audit Report"
+
+    - action: "slack"
+      channel: "#executive"
+      message: "Weekly audit report generated"
+
+    - action: "archive"
+      destination: "./reports/archive/"
+      retention_days: 365
+
+integrations:
+  accounting:
+    enabled: false
+    system: "quickbooks"  # quickbooks, xero, odoo
+    sync_revenue: true
+    sync_expenses: true
+
+  crm:
+    enabled: false
+    system: "salesforce"  # salesforce, hubspot
+    sync_customers: true
+    sync_pipeline: true
+
+  project_management:
+    enabled: false
+    system: "asana"  # asana, jira, trello
+    sync_tasks: true
+    sync_projects: true
+
+advanced:
+  trend_analysis:
+    enabled: true
+    periods: 4  # Compare last 4 periods
+    show_charts: true
+
+  forecasting:
+    enabled: false
+    method: "linear"  # linear, exponential, moving_average
+    periods_ahead: 4
+
+  benchmarking:
+    enabled: false
+    compare_to:
+      - "industry_average"
+      - "previous_year"
+      - "best_quarter"
+
+  anomaly_detection:
+    enabled: true
+    sensitivity: "medium"  # low, medium, high
+    alert_on_anomaly: true

@@ -1,0 +1,80 @@
+{
+  "mcpServers": {
+    "email-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gmail"
+      ],
+      "env": {
+        "GMAIL_CLIENT_ID": "your-gmail-client-id-here",
+        "GMAIL_CLIENT_SECRET": "your-gmail-client-secret-here",
+        "GMAIL_REFRESH_TOKEN": "your-gmail-refresh-token-here"
+      },
+      "description": "Gmail MCP server for sending emails and managing inbox"
+    },
+    "linkedin-mcp": {
+      "command": "node",
+      "args": [
+        "/path/to/linkedin-mcp-server/index.js"
+      ],
+      "env": {
+        "LINKEDIN_ACCESS_TOKEN": "your-linkedin-access-token-here",
+        "LINKEDIN_CLIENT_ID": "your-linkedin-client-id-here",
+        "LINKEDIN_CLIENT_SECRET": "your-linkedin-client-secret-here"
+      },
+      "description": "LinkedIn MCP server for posting content and managing connections"
+    }
+  },
+  "notes": {
+    "setup_instructions": [
+      "1. Gmail MCP Setup:",
+      "   - Create OAuth2 credentials in Google Cloud Console",
+      "   - Enable Gmail API",
+      "   - Generate refresh token using OAuth2 flow",
+      "   - Replace GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, and GMAIL_REFRESH_TOKEN",
+      "",
+      "2. LinkedIn MCP Setup:",
+      "   - Create LinkedIn App in LinkedIn Developer Portal",
+      "   - Request necessary permissions (w_member_social, r_liteprofile, etc.)",
+      "   - Generate access token",
+      "   - Replace LINKEDIN_ACCESS_TOKEN, LINKEDIN_CLIENT_ID, and LINKEDIN_CLIENT_SECRET",
+      "   - Update the path to your LinkedIn MCP server implementation",
+      "",
+      "3. WhatsApp Setup (Playwright-based, not MCP):",
+      "   - Install Playwright: pip install playwright && playwright install chromium",
+      "   - Run: python .claude/skills/whatsapp-ingest/scripts/whatsapp_ingest.py",
+      "   - Scan QR code with your phone (one-time setup)",
+      "   - Session saved in .whatsapp_session/ directory",
+      "   - Priority keywords: urgent, asap, invoice, payment, help",
+      "   - Optional: Set WHATSAPP_SESSION_PATH environment variable for custom session location",
+      "",
+      "4. Alternative: Use Claude Desktop's MCP configuration",
+      "   - Copy this configuration to ~/.config/claude/mcp.json (Linux/Mac)",
+      "   - Or %APPDATA%/Claude/mcp.json (Windows)",
+      "",
+      "5. Test MCP servers:",
+      "   - Run: npx @modelcontextprotocol/inspector",
+      "   - Verify both servers connect successfully",
+      "",
+      "6. Security:",
+      "   - Never commit this file with real credentials to version control",
+      "   - Add mcp.json to .gitignore",
+      "   - Protect .whatsapp_session/ directory with proper permissions",
+      "   - Use environment variables for production deployments"
+    ],
+    "required_permissions": {
+      "gmail": [
+        "gmail.readonly",
+        "gmail.send",
+        "gmail.modify"
+      ],
+      "linkedin": [
+        "w_member_social",
+        "r_liteprofile",
+        "r_emailaddress",
+        "w_organization_social"
+      ]
+    }
+  }
+}

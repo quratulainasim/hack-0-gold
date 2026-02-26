@@ -1,0 +1,201 @@
+name: "Customer Onboarding Workflow"
+description: "Automated customer onboarding process across multiple platforms"
+version: "1.0"
+
+variables:
+  customer_name: "Acme Corporation"
+  customer_email: "contact@acme.com"
+  customer_domain: "acme.com"
+  account_manager: "john@company.com"
+  onboarding_date: "2026-02-19"
+
+steps:
+  # Step 1: Send welcome email
+  - id: send_welcome_email
+    name: "Send welcome email to customer"
+    mcp_server: gmail
+    action: send_email
+    params:
+      to: "{{customer_email}}"
+      subject: "Welcome to Our Platform - {{customer_name}}"
+      body: |
+        Dear {{customer_name}} team,
+
+        Welcome to our platform! We're excited to have you on board.
+
+        Your account manager {{account_manager}} will be in touch shortly
+        to help you get started.
+
+        Best regards,
+        The Team
+    on_error: retry
+    retry_count: 3
+    retry_delay: 5
+
+  # Step 2: Create Slack channel (parallel with email)
+  - id: create_slack_channel
+    name: "Create dedicated Slack channel"
+    mcp_server: slack
+    action: create_channel
+    params:
+      name: "customer-{{customer_name | slugify}}"
+      is_private: false
+      topic: "Customer channel for {{customer_name}}"
+    on_error: continue
+    optional: true
+
+  # Step 3: Notify team in Slack
+  - id: notify_team_slack
+    name: "Notify team about new customer"
+    mcp_server: slack
+    action: send_message
+    params:
+      channel: "{{steps.create_slack_channel.result.channel_id}}"
+      text: |
+        🎉 New customer onboarded: *{{customer_name}}*
+
+        📧 Email: {{customer_email}}
+        👤 Account Manager: {{account_manager}}
+        📅 Onboarding Date: {{onboarding_date}}
+
+        Welcome aboard!
+    depends_on: [create_slack_channel]
+    optional: true
+
+  # Step 4: Create database record
+  - id: create_customer_record
+    name: "Create customer record in database"
+    mcp_server: database
+    action: insert
+    params:
+      table: "customers"
+      data:
+        name: "{{customer_name}}"
+        email: "{{customer_email}}"
+        domain: "{{customer_domain}}"
+        account_manager: "{{account_manager}}"
+        onboarding_date: "{{onboarding_date}}"
+        status: "active"
+    depends_on: [send_welcome_email]
+
+  # Step 5: LinkedIn announcement (parallel, optional)
+  - id: linkedin_announcement
+    name: "Post LinkedIn announcement"
+    mcp_server: linkedin
+    action: create_post
+    params:
+      text: |
+        Excited to welcome {{customer_name}} to our platform! 🚀
+
+        Looking forward to a great partnership.
+
+        #NewCustomer #Partnership
+      visibility: "public"
+    depends_on: [send_welcome_email]
+    optional: true
+
+  # Step 6: Schedule kickoff meeting
+  - id: schedule_kickoff
+    name: "Schedule kickoff meeting"
+    mcp_server: calendar
+    action: create_event
+    params:
+      title: "Kickoff Meeting - {{customer_name}}"
+      start: "2026-02-26T10:00:00Z"
+      end: "2026-02-26T11:00:00Z"
+      attendees:
+        - "{{customer_email}}"
+        - "{{account_manager}}"
+      location: "Zoom"
+      description: |
+        Kickoff meeting for {{customer_name}}
+
+        Agenda:
+        - Platform overview
+        - Account setup
+        - Q&A
+    depends_on: [create_customer_record]
+
+  # Step 7: Send calendar invite confirmation
+  - id: confirm_meeting
+    name: "Send meeting confirmation email"
+    mcp_server: gmail
+    action: send_email
+    params:
+      to: "{{customer_email}}"
+      cc: ["{{account_manager}}"]
+      subject: "Kickoff Meeting Scheduled - {{customer_name}}"
+      body: |
+        Hi {{customer_name}} team,
+
+        Your kickoff meeting has been scheduled for February 26, 2026 at 10:00 AM.
+
+        Meeting link: {{steps.schedule_kickoff.result.meeting_url}}
+
+        Looking forward to speaking with you!
+
+        Best regards,
+        {{account_manager}}
+    depends_on: [schedule_kickoff]
+
+  # Step 8: Create GitHub issue for setup tasks
+  - id: create_setup_issue
+    name: "Create setup tracking issue"
+    mcp_server: github
+    action: create_issue
+    params:
+      repo: "company/customer-onboarding"
+      title: "Setup: {{customer_name}}"
+      body: |
+        ## Customer Setup Checklist
+
+        Customer: {{customer_name}}
+        Email: {{customer_email}}
+        Account Manager: {{account_manager}}
+
+        - [ ] Welcome email sent
+        - [ ] Slack channel created
+        - [ ] Database record created
+        - [ ] Kickoff meeting scheduled
+        - [ ] Initial training completed
+        - [ ] First project setup
+
+        Database ID: {{steps.create_customer_record.result.id}}
+      labels: ["onboarding", "customer-setup"]
+      assignees: ["{{account_manager | slugify}}"]
+    depends_on: [create_customer_record]
+    optional: true
+
+  # Step 9: Final notification to account manager
+  - id: notify_account_manager
+    name: "Notify account manager of completion"
+    mcp_server: gmail
+    action: send_email
+    params:
+      to: "{{account_manager}}"
+      subject: "Onboarding Complete - {{customer_name}}"
+      body: |
+        Hi,
+
+        The automated onboarding process for {{customer_name}} is complete.
+
+        Summary:
+        - Welcome email: ✓ Sent
+        - Slack channel: {{steps.create_slack_channel.status}}
+        - Database record: ✓ Created (ID: {{steps.create_customer_record.result.id}})
+        - LinkedIn post: {{steps.linkedin_announcement.status}}
+        - Kickoff meeting: ✓ Scheduled
+        - GitHub issue: {{steps.create_setup_issue.status}}
+
+        Next steps:
+        1. Review the kickoff meeting agenda
+        2. Prepare onboarding materials
+        3. Follow up on GitHub issue
+
+        Customer Details:
+        - Name: {{customer_name}}
+        - Email: {{customer_email}}
+        - Domain: {{customer_domain}}
+
+        Good luck!
+    depends_on: [confirm_meeting, create_setup_issue]

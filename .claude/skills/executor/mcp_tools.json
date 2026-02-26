@@ -1,0 +1,54 @@
+{
+  "tool_mapping": {
+    "send_email": {
+      "mcp_server": "gmail",
+      "mcp_tool": "send_message",
+      "required_fields": ["to", "subject", "body"],
+      "optional_fields": ["cc", "bcc", "attachments"],
+      "description": "Send email via Gmail MCP"
+    },
+    "create_linkedin_post": {
+      "mcp_server": "browser",
+      "action": "navigate_and_interact",
+      "url": "https://www.linkedin.com",
+      "profile": "linkedin",
+      "selectors": {
+        "post_button": "button[aria-label='Start a post']",
+        "text_area": "div[role='textbox']",
+        "submit": "button[aria-label='Post']"
+      },
+      "description": "Create LinkedIn post via browser automation"
+    },
+    "send_whatsapp_message": {
+      "mcp_server": "browser",
+      "action": "navigate_and_interact",
+      "url": "https://web.whatsapp.com",
+      "profile": "whatsapp",
+      "selectors": {
+        "search": "div[contenteditable='true'][data-tab='3']",
+        "chat": "span[title='{{contact_name}}']",
+        "message_box": "div[contenteditable='true'][data-tab='10']",
+        "send": "button[data-testid='compose-btn-send']"
+      },
+      "description": "Send WhatsApp message via browser automation"
+    }
+  },
+  "safety_rules": {
+    "require_approved_folder": true,
+    "require_plan_md": true,
+    "require_mcp_connectivity": true,
+    "max_retries": 3,
+    "timeout_seconds": 30,
+    "log_all_executions": true
+  },
+  "execution_modes": {
+    "dry_run": {
+      "enabled": false,
+      "description": "Simulate execution without actually sending"
+    },
+    "production": {
+      "enabled": true,
+      "description": "Execute real actions via MCP"
+    }
+  }
+}

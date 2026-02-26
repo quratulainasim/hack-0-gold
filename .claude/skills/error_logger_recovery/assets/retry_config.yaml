@@ -1,0 +1,193 @@
+retry:
+  # Default retry configuration
+  default:
+    max_retries: 3
+    base_delay: 1.0
+    max_delay: 60.0
+    exponential_base: 2.0
+    jitter: true
+
+  # API calls - more retries, longer delays
+  api_calls:
+    max_retries: 5
+    base_delay: 2.0
+    max_delay: 120.0
+    exponential_base: 2.0
+    jitter: true
+
+  # Database operations - quick retries
+  database:
+    max_retries: 5
+    base_delay: 0.5
+    max_delay: 30.0
+    exponential_base: 2.0
+    jitter: false
+
+  # File operations - few retries
+  file_operations:
+    max_retries: 3
+    base_delay: 0.5
+    max_delay: 10.0
+    exponential_base: 2.0
+    jitter: false
+
+  # Message queue - many retries
+  message_queue:
+    max_retries: 10
+    base_delay: 1.0
+    max_delay: 300.0
+    exponential_base: 2.0
+    jitter: true
+
+circuit_breaker:
+  # Default circuit breaker settings
+  default:
+    failure_threshold: 5
+    timeout: 60
+    expected_exception: Exception
+
+  # External API - higher threshold
+  external_api:
+    failure_threshold: 10
+    timeout: 120
+    expected_exception: RequestException
+
+  # Database - lower threshold
+  database:
+    failure_threshold: 3
+    timeout: 30
+    expected_exception: DatabaseError
+
+  # Payment service - very sensitive
+  payment:
+    failure_threshold: 2
+    timeout: 300
+    expected_exception: PaymentError
+
+error_classification:
+  # Transient errors - should retry
+  transient:
+    - TimeoutError
+    - ConnectionError
+    - ConnectionResetError
+    - BrokenPipeError
+    - TemporaryFailure
+    - ServiceUnavailable
+    - TooManyRequests
+    - RequestTimeout
+
+  # Permanent errors - don't retry
+  permanent:
+    - ValueError
+    - TypeError
+    - KeyError
+    - AttributeError
+    - AuthenticationError
+    - AuthorizationError
+    - PermissionError
+    - NotFoundError
+    - ValidationError
+
+  # Rate limit errors - special handling
+  rate_limit:
+    - RateLimitError
+    - TooManyRequests
+    - QuotaExceeded
+
+retry_budget:
+  enabled: true
+  max_retries_per_minute: 100
+  max_retries_per_hour: 500
+  alert_threshold: 0.8  # Alert at 80% of budget
+
+timeouts:
+  # Default timeouts by operation type
+  api_call: 30
+  database_query: 10
+  file_operation: 5
+  network_request: 30
+  long_running: 300
+
+monitoring:
+  enabled: true
+
+  metrics:
+    - total_attempts
+    - successful_attempts
+    - failed_attempts
+    - retry_count
+    - average_retry_delay
+    - circuit_breaker_trips
+
+  alerts:
+    - condition: "retry_rate > 0.5"
+      severity: warning
+      message: "High retry rate detected"
+
+    - condition: "circuit_breaker_open"
+      severity: critical
+      message: "Circuit breaker opened"
+
+    - condition: "error_rate > 0.1"
+      severity: warning
+      message: "High error rate detected"
+
+logging:
+  # Log retry attempts
+  log_retries: true
+  log_level: WARNING
+
+  # Log circuit breaker state changes
+  log_circuit_breaker: true
+
+  # Log all errors
+  log_errors: true
+  log_error_level: ERROR
+
+  # Include stack traces
+  include_stack_trace: true
+
+  # Structured logging
+  structured: true
+
+  # Sampling for high-volume logs
+  sampling:
+    enabled: true
+    rate: 0.1  # Log 10% of debug messages
+
+advanced:
+  # Adaptive retry - adjust based on success rate
+  adaptive_retry:
+    enabled: false
+    min_delay: 0.5
+    max_delay: 120.0
+
+  # Exponential backoff with decorrelated jitter
+  decorrelated_jitter:
+    enabled: false
+
+  # Retry only on specific HTTP status codes
+  http_retry_codes:
+    - 408  # Request Timeout
+    - 429  # Too Many Requests
+    - 500  # Internal Server Error
+    - 502  # Bad Gateway
+    - 503  # Service Unavailable
+    - 504  # Gateway Timeout
+
+  # Custom retry strategies by service
+  service_strategies:
+    payment_gateway:
+      max_retries: 2
+      base_delay: 5.0
+      jitter: false
+
+    email_service:
+      max_retries: 5
+      base_delay: 2.0
+      jitter: true
+
+    analytics_service:
+      max_retries: 3
+      base_delay: 1.0
+      jitter: true

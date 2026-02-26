@@ -1,0 +1,40 @@
+# Gold Tier - Autonomous AI Employee System
+# Python 3.10+
+
+# Core Dependencies
+playwright==1.40.0
+requests==2.31.0
+python-dotenv==1.0.0
+
+# FREE AI Content Generation (Google Gemini)
+google-generativeai>=0.8.0
+
+# File System Monitoring
+watchdog==3.0.0
+
+# Gmail API Integration
+google-auth==2.25.2
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.108.0
+
+# LinkedIn API (optional - browser automation is primary method)
+linkedin-api==2.2.0
+
+# Twitter/X API
+tweepy==4.14.0
+
+# Odoo ERP Integration
+# Note: xmlrpc is built-in to Python, no need to install
+
+# Data Processing
+# Note: pathlib is built-in to Python 3.4+, pathlib2 not needed
+
+# Optional: Enhanced features
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Development Tools (optional)
+# pytest==7.4.3
+# black==23.12.1
+# flake8==6.1.0

@@ -1,0 +1,86 @@
+name: "Social Media Cross-Post"
+description: "Post the same message across multiple social media platforms"
+version: "1.0"
+
+variables:
+  message: "Excited to announce our new product launch! 🚀"
+  image_url: "https://company.com/images/product-launch.jpg"
+  link_url: "https://company.com/products/new-launch"
+
+steps:
+  # Post to LinkedIn
+  - id: post_linkedin
+    name: "Post to LinkedIn"
+    mcp_server: linkedin
+    action: create_post
+    params:
+      text: |
+        {{message}}
+
+        Learn more: {{link_url}}
+      visibility: "public"
+      media:
+        - url: "{{image_url}}"
+          type: "image"
+    on_error: continue
+    optional: true
+
+  # Post to Twitter
+  - id: post_twitter
+    name: "Post to Twitter"
+    mcp_server: twitter
+    action: create_tweet
+    params:
+      text: "{{message}} {{link_url}}"
+      media:
+        - url: "{{image_url}}"
+    on_error: continue
+    optional: true
+
+  # Post to Facebook
+  - id: post_facebook
+    name: "Post to Facebook"
+    mcp_server: facebook
+    action: create_post
+    params:
+      message: "{{message}}"
+      link: "{{link_url}}"
+      image: "{{image_url}}"
+    on_error: continue
+    optional: true
+
+  # Notify team in Slack
+  - id: notify_slack
+    name: "Notify team in Slack"
+    mcp_server: slack
+    action: send_message
+    params:
+      channel: "#marketing"
+      text: |
+        📢 Social media posts published!
+
+        Message: {{message}}
+
+        Platforms:
+        - LinkedIn: {{steps.post_linkedin.status}}
+        - Twitter: {{steps.post_twitter.status}}
+        - Facebook: {{steps.post_facebook.status}}
+    depends_on: [post_linkedin, post_twitter, post_facebook]
+
+  # Log to database
+  - id: log_campaign
+    name: "Log campaign to database"
+    mcp_server: database
+    action: insert
+    params:
+      table: "social_campaigns"
+      data:
+        message: "{{message}}"
+        platforms:
+          linkedin: "{{steps.post_linkedin.status}}"
+          twitter: "{{steps.post_twitter.status}}"
+          facebook: "{{steps.post_facebook.status}}"
+        posted_at: "{{workflow.started_at}}"
+        image_url: "{{image_url}}"
+        link_url: "{{link_url}}"
+    depends_on: [notify_slack]
