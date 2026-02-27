@@ -114,8 +114,6 @@ Pending_Approval/*
 Approved/*
 !Approved/.gitkeep
 
-Done/*
-!Done/.gitkeep
 
 # Keep logs folder structure
 logs/*
