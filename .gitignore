@@ -108,6 +108,9 @@ Inbox/*
 Needs_Action/*
 !Needs_Action/.gitkeep
 
+Pending_Approval/*
+!Pending_Approval/.gitkeep
+
 Approved/*
 !Approved/.gitkeep
 
